@@ -24,13 +24,20 @@
     Example syntax:
     PS C:\> .\__remediation_template(STIG-ID-WN10-CC-000040).ps1 
 #>
-# Define the registry path and values
+# Define the registry path and value
 $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LanmanWorkstation"
 $valueName = "AllowInsecureGuestAuth"
 $valueData = 0
 
+# Create the registry key if it doesn't exist
+if (-not (Test-Path -Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
+}
+
 # Set the registry value
-Set-ItemProperty -Path $registryPath -Name $valueName -Value $valueData -Type DWord
+New-ItemProperty -Path $registryPath -Name $valueName -Value $valueData -PropertyType DWord -Force
 
 # Output confirmation
 Write-Host "Set '$valueName' to '$valueData' at '$registryPath'"
+
+gpupdate /force
